@@ -7,7 +7,7 @@
 const char* ssid = "aaron"; 		// modify the ssid 
 const char* password = "876543210";	// modify the password
 char apiUrl[512];
-const char *API_KEY = "6008063a-4108-44c4-9838-c017a4d7c55b";	// modify the API_KEY
+const char *API_KEY = "6008063a-4108-44c4-9838-c017xxxxx";	// modify the API_KEY
 
 #define PIN_WS2812  48 
 #define NUM_PIXELS  1
