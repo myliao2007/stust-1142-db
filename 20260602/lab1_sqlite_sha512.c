@@ -212,10 +212,13 @@ void verifyLogin(String user, String pass) {
   Serial.println();
   Serial.print(GROUP); Serial.println("----------------- [ 執行登入驗證 ] -----------------");
   
+  // ✨ 把這兩行加回來：印出準備驗證的帳號與密碼
+  Serial.print(GROUP); Serial.printf("學生輸入帳號: %s\n", user.c_str());
+  Serial.print(GROUP); Serial.printf("學生輸入密碼: %s\n", pass.c_str());
+  
   sqlite3_stmt *stmt;
   const char *sql = "SELECT salt, hashHex FROM Users WHERE username = ?;";
   
-  // ✨ 新增：印出查詢語法
   Serial.print(GROUP); Serial.print("SQL> "); Serial.println(sql);
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
@@ -230,15 +233,23 @@ void verifyLogin(String user, String pass) {
     String systemKnownHash = (const char*)sqlite3_column_text(stmt, 1);
     sqlite3_finalize(stmt); 
     
+    // ✨ 把這段加回來：印出資料庫抓出的 Salt 與計算過程
+    Serial.print(GROUP); Serial.printf("系統已知該帳號的 Salt: %s\n", systemSalt.c_str());
+    Serial.print(GROUP); Serial.printf("系統紀錄的已知雜湊 (Known Hash):\n" GROUP "👉 %s\n", systemKnownHash.c_str());
+
     String inputComputedHash = computeSHA512(systemSalt + pass);
+    Serial.print(GROUP); Serial.printf("本次輸入計算之雜湊 (Input Hash):\n" GROUP "👉 %s\n", inputComputedHash.c_str());
 
     if (inputComputedHash == systemKnownHash) {
+      Serial.print(GROUP); Serial.println("✨ [比對結果] Hash 完全吻合！");
       Serial.print(GROUP); Serial.println("🔓 [驗證結果] 🔴 登入成功 (Login Success)！");
     } else {
+      Serial.print(GROUP); Serial.println("⚠️ [比對結果] Hash 不符！密碼錯誤！");
       Serial.print(GROUP); Serial.println("❌ [驗證結果] 登入失敗 (Invalid Password)");
     }
   } else {
     sqlite3_finalize(stmt);
+    Serial.print(GROUP); Serial.println("🔍 [檢查結果] 帳號不存在！");
     Serial.print(GROUP); Serial.println("❌ [驗證結果] 登入失敗 (User Not Found)");
   }
   Serial.print(GROUP); Serial.println("---------------------------------------------------\n");
@@ -372,6 +383,8 @@ void loop() {
 
         case AUTH_WAIT_USER:
           currentUsername = inputBuffer;
+          // ✨ 把這行加回來：印出剛才輸入的帳號
+          Serial.print(GROUP); Serial.printf("輸入帳號: %s\n", currentUsername.c_str());
           Serial.print(GROUP); Serial.println("請輸入「密碼 (Password)」:");
           currentState = AUTH_WAIT_PASS;
           break;
@@ -395,4 +408,3 @@ void loop() {
     stringComplete = false;
   }
 }
-
